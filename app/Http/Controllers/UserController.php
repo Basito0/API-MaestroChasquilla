@@ -20,14 +20,14 @@ class UserController extends Controller
                 'password' => 'required|string|min:6',
             ]);
             $user = User::create([
-                'FirstName' => $validated['fname'],
-                'LastName' => $validated['lname'],
-                'PhoneNumber' => $validated['phone'],
-                'Adress' => $validated['address'],
-                'Email' => $validated['email'],
-                'Pass' => bcrypt($validated['password']),
-                'ProfilePath' => 'default.jpg',
-                'Score' => 0,
+                'first_name' => $validated['fname'],
+                'last_name' => $validated['lname'],
+                'phone_number' => $validated['phone'],
+                'address' => $validated['address'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+                'profile_path' => 'default.jpg',
+                'score' => 0,
             ]);
 
             return response()->json(['message' => 'User created successfully', 'user' => $user]);

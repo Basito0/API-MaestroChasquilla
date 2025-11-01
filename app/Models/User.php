@@ -1,53 +1,78 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+/**
+ * Class User
+ * 
+ * @property int $user_id
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $phone_number
+ * @property string $address
+ * @property string $email
+ * @property Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $profile_path
+ * @property int $score
+ * @property string|null $remember_token
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * 
+ * @property Collection|Client[] $clients
+ * @property Collection|Review[] $reviews
+ * @property Collection|Worker[] $workers
+ *
+ * @package App\Models
+ */
+class User extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+	protected $table = 'users';
+	protected $primaryKey = 'user_id';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'first_name',
-        'last_name',
-        'phone_number',
-        'address',
-        'email',
-        'profile_path',
-        'score'
-    ];
-    protected $primaryKey = 'user_id';
+	protected $casts = [
+		'email_verified_at' => 'datetime',
+		'score' => 'int'
+	];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+	protected $hidden = [
+		'password',
+		'remember_token'
+	];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+	protected $fillable = [
+		'first_name',
+		'last_name',
+		'phone_number',
+		'address',
+		'email',
+		'email_verified_at',
+		'password',
+		'profile_path',
+		'score',
+		'remember_token'
+	];
+
+	public function clients()
+	{
+		return $this->hasMany(Client::class);
+	}
+
+	public function reviews()
+	{
+		return $this->hasMany(Review::class, 'reviewer_id');
+	}
+
+	public function workers()
+	{
+		return $this->hasMany(Worker::class);
+	}
 }
