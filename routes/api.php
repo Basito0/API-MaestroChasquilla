@@ -32,6 +32,7 @@ Route::get('/user/{id}', function ($id) {
 });
 
 Route::post('/signup', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
 
 Route::options('/clientrequests', function () {
     return response('', 204)
@@ -49,6 +50,31 @@ Route::get('/clientrequests', function () {
     }
 
     $sql = "SELECT * FROM client_requests";
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        return response()->json(['error' => 'Query failed'], 500);
+    }
+
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+
+    return response()->json($data);
+});
+
+Route::get('/workerrequests', function(){
+    $servername = "localhost";
+    $username = "root";
+    $password = "Contraseña302;";
+    $dbname = "maestrochasquilla";
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+    $sql = "SELECT * FROM worker_requests";
     $result = $conn->query($sql);
 
     if (!$result) {

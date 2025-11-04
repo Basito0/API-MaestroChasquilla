@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -34,6 +37,33 @@ class UserController extends Controller
         } catch (\Exception $e) {
             
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function login(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $credentials = $request->only('email', 'password');
+
+            if (Auth::attempt($credentials)) {
+                $user = Auth::user();
+                return response()->json(['message' => 'Login exitoso', 'user' => $user]);
+            }
+
+            return response()->json(['message' => 'Credenciales inválidas'], 401);
+
+        } catch (\Throwable $e) {
+            Log::error('Login error: '.$e->getMessage());
+            return response()->json(['message' => 'Error interno del servidor'], 500);
         }
     }
 }
