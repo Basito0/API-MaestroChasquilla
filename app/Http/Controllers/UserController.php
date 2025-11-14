@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Worker;
+use App\Models\Client;
 
 class UserController extends Controller
 {
@@ -21,6 +23,7 @@ class UserController extends Controller
                 'address' => 'required|string',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
+                'type' => 'required|in:1,2',
             ]);
             $user = User::create([
                 'first_name' => $validated['fname'],
@@ -33,7 +36,21 @@ class UserController extends Controller
                 'score' => 0,
             ]);
 
-            return response()->json(['message' => 'User created successfully', 'user' => $user]);
+            if ($validated['type'] == 1) {
+                Client::create([
+                    'user_id' => $user->user_id,
+                ]);
+            } else {
+                Worker::create([
+                    'user_id' => $user->user_id,
+                ]);
+            }
+
+            return response()->json([
+                'user' => $user,
+                'message' => 'User created successfully', 'user' => $user,
+            ]);
+
         } catch (\Exception $e) {
             
             return response()->json(['error' => $e->getMessage()], 500);
