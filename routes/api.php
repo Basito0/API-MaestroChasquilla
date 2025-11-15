@@ -7,6 +7,12 @@ use App\Http\Middleware\Cors;
 use App\Models\Client;
 use App\Models\Worker;
 
+Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
+    $user = Auth::user(); // usuario autenticado por el token
+
+    return response()->json($user);
+});
+
 Route::middleware('auth:sanctum')->post('/logout', function () {
     $user = Auth::user();
 
