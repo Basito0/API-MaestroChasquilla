@@ -4,6 +4,35 @@ use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Cors;
+use App\Models\Client;
+use App\Models\Worker;
+
+Route::middleware('auth:sanctum')->post('/logout', function () {
+    $user = Auth::user();
+
+    // Delete the current access token
+    $user->currentAccessToken()->delete();
+
+    return response()->json(['message' => 'Logout exitoso']);
+});
+
+Route::middleware('auth:sanctum')->get('/user/type', function () {
+    $user = Auth::user();
+
+    if (!$user) {
+        return response()->json(['error' => 'Not authenticated'], 401);
+    }
+
+    if ($user->clients) {
+        return response()->json(['type' => 1]); // client
+    }
+
+    if ($user->workers) {
+        return response()->json(['type' => 2]); // worker
+    }
+
+    return response()->json(['error' => 'User has no role'], 404);
+});
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -19,16 +48,15 @@ Route::get('/user/{id}', function ($id) {
         die("Connection failed: " . $conn->connect_error);
     }
     
-    $sql = "SELECT * FROM Users WHERE UserID =" . $id;
+    $sql = "SELECT * FROM users WHERE user_id =" . $id;
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            echo "UserID: " . $row["UserID"]. " - Name: " . $row["FirstName"]. " " . $row["LastName"]. "<br>";
-        }
-    } else {
-        echo "0 results";
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
     }
+
+    return response()->json($data);
 });
 
 Route::post('/signup', [UserController::class, 'register']);

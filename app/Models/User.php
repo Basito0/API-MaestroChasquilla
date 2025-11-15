@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-
+use Laravel\Sanctum\HasApiTokens;
 /**
  * Class User
  * 
@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class User extends Authenticatable
 {
-	use Notifiable;
+	use HasApiTokens, Notifiable;
 	protected $table = 'users';
 	protected $primaryKey = 'user_id';
 
@@ -67,7 +67,7 @@ class User extends Authenticatable
 
 	public function clients()
 	{
-		return $this->hasMany(Client::class);
+		return $this->hasMany(Client::class, 'user_id', 'user_id');
 	}
 
 	public function reviews()
@@ -77,6 +77,6 @@ class User extends Authenticatable
 
 	public function workers()
 	{
-		return $this->hasMany(Worker::class);
+		return $this->hasMany(Worker::class, 'user_id', 'user_id');
 	}
 }

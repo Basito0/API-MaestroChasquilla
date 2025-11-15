@@ -73,7 +73,15 @@ class UserController extends Controller
 
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
-                return response()->json(['message' => 'Login exitoso', 'user' => $user]);
+
+                // Create a token for stateless authentication
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return response()->json([
+                    'message' => 'Login exitoso',
+                    'user' => $user,
+                    'token' => $token,
+                ]);
             }
 
             return response()->json(['message' => 'Credenciales inválidas'], 401);
@@ -83,5 +91,6 @@ class UserController extends Controller
             return response()->json(['message' => 'Error interno del servidor'], 500);
         }
     }
+
 }
 
