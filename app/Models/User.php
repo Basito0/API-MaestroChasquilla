@@ -67,7 +67,7 @@ class User extends Authenticatable
 
 	public function clients()
 	{
-		return $this->hasMany(Client::class, 'user_id', 'user_id');
+		return $this->hasOne(Client::class, 'user_id', 'user_id');
 	}
 
 	public function reviews()
@@ -77,6 +77,6 @@ class User extends Authenticatable
 
 	public function workers()
 	{
-		return $this->hasMany(Worker::class, 'user_id', 'user_id');
+		return $this->hasOne(Worker::class, 'user_id', 'user_id');
 	}
 }
