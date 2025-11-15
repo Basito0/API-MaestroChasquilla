@@ -29,11 +29,11 @@ Route::middleware('auth:sanctum')->get('/user/type', function () {
         return response()->json(['error' => 'Not authenticated'], 401);
     }
 
-    if ($user->clients) {
+    if ($user->clients()->exists()) {
         return response()->json(['type' => 1]); // client
     }
 
-    if ($user->workers) {
+    if ($user->workers()->exists()) {
         return response()->json(['type' => 2]); // worker
     }
 
