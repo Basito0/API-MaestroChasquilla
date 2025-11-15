@@ -41,7 +41,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/user/{id}', function ($id) {
     $servername = "localhost";
     $username = "root";
-    $password = "Contraseña302;";
+    $password = "850221B";
     $dbname = "maestrochasquilla";
     $conn = new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) {
@@ -71,7 +71,7 @@ Route::options('/clientrequests', function () {
 
 
 Route::get('/clientrequests', function () {
-    $conn = new mysqli("localhost", "root", "Contraseña302;", "maestrochasquilla");
+    $conn = new mysqli("localhost", "root", "850221B", "maestrochasquilla");
 
     if ($conn->connect_error) {
         return response()->json(['error' => 'Connection failed'], 500);
@@ -95,7 +95,7 @@ Route::get('/clientrequests', function () {
 Route::get('/workerrequests', function(){
     $servername = "localhost";
     $username = "root";
-    $password = "Contraseña302;";
+    $password = "850221B";
     $dbname = "maestrochasquilla";
     $conn = new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) {
