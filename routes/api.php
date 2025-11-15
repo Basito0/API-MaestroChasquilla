@@ -25,20 +25,15 @@ Route::middleware('auth:sanctum')->post('/logout', function () {
 Route::middleware('auth:sanctum')->get('/user/type', function () {
     $user = Auth::user();
 
-    if (!$user) {
-        return response()->json(['error' => 'Not authenticated'], 401);
-    }
-
-    if ($user->clients) {
-        return response()->json(['type' => 1]); // client
-    }
-
     if ($user->workers) {
-        return response()->json(['type' => 2]); // worker
+        return response()->json(['type' => 2]);
+    } elseif ($user->clients) {
+        return response()->json(['type' => 1]);
     }
 
-    return response()->json(['error' => 'User has no role'], 404);
+    return response()->json(['type' => null]);
 });
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
