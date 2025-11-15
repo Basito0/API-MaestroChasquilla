@@ -71,17 +71,3 @@ Route::get('/works', function(){
         echo "0 results";
     }
 });
-
-#WORK IN PROGRESS
-Route::get('/profile', function(){
-    $servername = "localhost";
-    $username = "root";
-    $password = "Contraseña302;";
-    $dbname = "maestrochasquilla";
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    echo "Devolviendo perfil";
-});
