@@ -7,6 +7,8 @@ use App\Http\Middleware\Cors;
 use App\Models\Client;
 use App\Models\Worker;
 use App\Models\ClientRequest;
+use App\Models\WorkerRequest;
+
 
 Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
     $user = Auth::user(); // usuario autenticado por el token
@@ -76,51 +78,28 @@ Route::options('/clientrequests', function () {
 
 
 Route::get('/clientrequests', function () {
-    $conn = new mysqli("localhost", "root", "850221B", "maestrochasquilla");
+    try {
+        $requests = ClientRequest::all();
 
-    if ($conn->connect_error) {
-        return response()->json(['error' => 'Connection failed'], 500);
+        return response()->json($requests);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Query failed', 'details' => $e->getMessage()], 500);
     }
-
-    $sql = "SELECT * FROM client_requests";
-    $result = $conn->query($sql);
-
-    if (!$result) {
-        return response()->json(['error' => 'Query failed'], 500);
-    }
-
-    $data = [];
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
-
-    return response()->json($data);
 });
 
-Route::get('/workerrequests', function(){
-    $servername = "localhost";
-    $username = "root";
-    $password = "850221B";
-    $dbname = "maestrochasquilla";
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    
-    $sql = "SELECT * FROM worker_requests";
-    $result = $conn->query($sql);
+Route::get('/workerrequests', function () {
+    try {
+        $requests = WorkerRequest::all();
 
-    if (!$result) {
-        return response()->json(['error' => 'Query failed'], 500);
+        return response()->json($requests);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Query failed',
+            'details' => $e->getMessage()
+        ], 500);
     }
-
-    $data = [];
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
-
-    return response()->json($data);
 });
+
 
 Route::middleware('auth:sanctum')->post('/create-client-request', function (Request $request) {
     $user = Auth::user();
