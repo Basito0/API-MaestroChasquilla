@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Cors;
 use App\Models\Client;
 use App\Models\Worker;
+use App\Models\ClientRequest;
 
 Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
     $user = Auth::user(); // usuario autenticado por el token
@@ -119,4 +120,35 @@ Route::get('/workerrequests', function(){
     }
 
     return response()->json($data);
+});
+
+Route::middleware('auth:sanctum')->post('/create-client-request', function (Request $request) {
+    $user = Auth::user();
+
+    // Validar entrada
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string|max:255',
+        'budget' => 'required|integer|min:0',
+        'street' => 'required|string|max:200',
+        'city' => 'required|string|max:30',
+        'region' => 'required|string|max:25',
+    ]);
+
+    // Concatenar dirección
+    $address = "{$validated['street']}, {$validated['city']}, {$validated['region']}";
+
+    // Crear registro
+    $clientRequest = ClientRequest::create([
+        'client_id' => $user->client->client_id ?? null, // relación con tabla clients
+        'title' => $validated['title'],
+        'description' => $validated['description'],
+        'budget' => $validated['budget'],
+        'address' => $address,
+    ]);
+
+    return response()->json([
+        'message' => 'Solicitud creada exitosamente',
+        'client_request' => $clientRequest
+    ], 201);
 });
