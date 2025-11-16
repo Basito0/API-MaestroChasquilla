@@ -92,5 +92,35 @@ class UserController extends Controller
         }
     }
 
+    public function updateProfile(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'fname'  => 'required|string',
+                'lname'  => 'required|string',
+                'phone'  => 'required|string',
+                'address'=> 'required|string',
+            ]);
+
+            $user = Auth::user();
+
+            $user->update([
+                'first_name'   => $validated['fname'],
+                'last_name'    => $validated['lname'],
+                'phone_number' => $validated['phone'],
+                'address'      => $validated['address'],
+            ]);
+
+            return response()->json([
+                'message' => 'Perfil actualizado correctamente',
+                'user' => $user
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
 }
 
