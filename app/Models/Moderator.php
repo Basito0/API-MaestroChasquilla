@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Client
+ * Class Moderators
  * 
  * @property int $mod_id
  * @property int|null $user_id
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Moderators extends Model
+class Moderator extends Model
 {
 	protected $table = 'moderators';
 	protected $primaryKey = 'mod_id';
