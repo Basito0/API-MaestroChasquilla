@@ -35,9 +35,8 @@ class Client extends Model
 		'user_id'
 	];
 
-	public function user()
-	{
-		return $this->belongsTo(User::class);
+	public function user() {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
 	}
 
 	public function client_requests()

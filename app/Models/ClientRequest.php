@@ -43,10 +43,9 @@ class ClientRequest extends Model
 		'address'
 	];
 
-	public function client()
-	{
-		return $this->belongsTo(Client::class);
-	}
+	public function client() {
+        return $this->belongsTo(Client::class, 'client_id', 'client_id');
+    }
 
 	public function works()
 	{

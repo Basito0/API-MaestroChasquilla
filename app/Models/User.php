@@ -65,10 +65,11 @@ class User extends Authenticatable
 		'remember_token'
 	];
 
-	public function clients()
+	public function client()
 	{
 		return $this->hasOne(Client::class, 'user_id', 'user_id');
 	}
+
 
 	public function reviews()
 	{

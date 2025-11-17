@@ -101,7 +101,7 @@ Route::get('/workerrequests', function () {
 });
 
 Route::get('/clientrequests/{id}', function ($id) {
-    $request = ClientRequest::find($id);
+    $request = ClientRequest::with('client.user')->find($id);
 
     if (!$request) {
         return response()->json(['error' => 'Request not found'], 404);
@@ -111,10 +111,10 @@ Route::get('/clientrequests/{id}', function ($id) {
 });
 
 
+
 Route::middleware('auth:sanctum')->post('/create-client-request', function (Request $request) {
     $user = Auth::user();
 
-    // Validar entrada
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'required|string|max:255',
@@ -124,12 +124,10 @@ Route::middleware('auth:sanctum')->post('/create-client-request', function (Requ
         'region' => 'required|string|max:25',
     ]);
 
-    // Concatenar dirección
     $address = "{$validated['street']}, {$validated['city']}, {$validated['region']}";
 
-    // Crear registro
     $clientRequest = ClientRequest::create([
-        'client_id' => $user->client->client_id ?? null, // relación con tabla clients
+        'client_id' => $user->client?->client_id, // now works
         'title' => $validated['title'],
         'description' => $validated['description'],
         'budget' => $validated['budget'],
