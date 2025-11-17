@@ -121,6 +121,13 @@ class UserController extends Controller
         }
     }
 
+    public function getProfile(Request $request)
+    {
+        $user = $request->user(); // usuario autenticado
+        $user->load(['workers.categories']); // carga worker y sus categorías
+        return response()->json($user);
+    }
+
 
 }
 

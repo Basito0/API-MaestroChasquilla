@@ -10,14 +10,22 @@ class WorkerController extends Controller
     public function updateCategories(Request $request)
     {
         $user = Auth::user();
-        $worker = $user->worker;
+
+        // Obtener el worker desde la relación plural
+        $worker = $user->workers()->first();
+
+        if (!$worker) {
+            return response()->json(['message' => 'Este usuario no es maestro'], 403);
+        }
 
         $validated = $request->validate([
-            'categories' => 'required|array',
+            'categories' => 'array', 
             'categories.*' => 'integer|exists:categories,category_id',
         ]);
 
-        $worker->categories()->sync($validated['categories']);
+        // Sincronizar categorías
+        $worker->categories()->sync($validated['categories'] ?? []);
+
 
         return response()->json([
             'message' => 'Categorías actualizadas correctamente',

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\WorkerController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Cors;
@@ -12,11 +14,14 @@ use App\Models\WorkerRequest;
 
 
 
-Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
-    $user = Auth::user(); // usuario autenticado por el token
+//Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
+  //  $user = Auth::user(); // usuario autenticado por el token
 
-    return response()->json($user);
-});
+    //return response()->json($user);
+//});
+
+Route::middleware('auth:sanctum')->get('/profile', [UserController::class, 'getProfile']);
+
 
 Route::middleware('auth:sanctum')->put('/profile/update', [UserController::class, 'updateProfile']);
 
@@ -43,9 +48,15 @@ Route::middleware('auth:sanctum')->get('/user/type', function () {
 });
 
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+#Route::get('/user', function (Request $request) {
+ #   return $request->user();
+#})->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    $user = $request->user();
+    $user->load('workers.categories'); // carga el worker y sus categorías
+    return response()->json($user);
+});
 
 Route::get('/user/{id}', function ($id) {
     $servername = "localhost";
@@ -113,6 +124,7 @@ Route::get('/clientrequests/{id}', function ($id) {
 
     return response()->json($request);
 });
+Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::get('/workers/search', [CategoryController::class, 'searchWorkers']);
 
