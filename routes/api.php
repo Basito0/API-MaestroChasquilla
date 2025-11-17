@@ -100,6 +100,16 @@ Route::get('/workerrequests', function () {
     }
 });
 
+Route::get('/clientrequests/{id}', function ($id) {
+    $request = ClientRequest::find($id);
+
+    if (!$request) {
+        return response()->json(['error' => 'Request not found'], 404);
+    }
+
+    return response()->json($request);
+});
+
 
 Route::middleware('auth:sanctum')->post('/create-client-request', function (Request $request) {
     $user = Auth::user();
