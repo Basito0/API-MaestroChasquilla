@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Cors;
@@ -8,6 +9,7 @@ use App\Models\Client;
 use App\Models\Worker;
 use App\Models\ClientRequest;
 use App\Models\WorkerRequest;
+
 
 
 Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
@@ -69,6 +71,8 @@ Route::get('/user/{id}', function ($id) {
 Route::post('/signup', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
+Route::middleware('auth:sanctum')->post('/worker/categories', [WorkerController::class, 'updateCategories']);
+
 Route::options('/clientrequests', function () {
     return response('', 204)
         ->header('Access-Control-Allow-Origin', 'http://localhost:5173')
@@ -110,6 +114,7 @@ Route::get('/clientrequests/{id}', function ($id) {
     return response()->json($request);
 });
 
+Route::get('/workers/search', [CategoryController::class, 'searchWorkers']);
 
 Route::middleware('auth:sanctum')->post('/create-client-request', function (Request $request) {
     $user = Auth::user();

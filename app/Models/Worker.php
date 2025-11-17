@@ -49,4 +49,17 @@ class Worker extends Model
 	{
 		return $this->hasMany(Work::class);
 	}
+
+	public function categories()
+    {
+        return $this->belongsToMany(
+            Category::class,        // modelo relacionado
+            'worker_categories',    // tabla pivote
+            'worker_id',            // FK del modelo actual en la pivote
+            'category_id'           // FK del modelo relacionado en la pivote
+        );
+    }
+
+
+
 }
