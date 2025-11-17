@@ -32,5 +32,51 @@ class WorkerController extends Controller
             'categories' => $worker->categories
         ]);
     }
+
+    public function searchWorkers(Request $request)
+    {
+        $request->validate([
+            'category' => 'nullable|string',
+            'city'     => 'nullable|string',
+            'region'   => 'nullable|string',
+        ]);
+
+        $query = \App\Models\User::whereHas('workers');
+
+        // Filtrar por categoría
+        if ($request->category) {
+            $query->whereHas('workers.categories', function($q) use ($request) {
+                $q->where('name', $request->category);
+            });
+        }
+
+        // Filtrar por ciudad y región
+        if ($request->city) {
+            $query->where('address', 'like', '%' . $request->city . '%');
+        }
+        if ($request->region) {
+            $query->where('address', 'like', '%' . $request->region . '%');
+        }
+
+        // Cargar relación correctamente
+        $users = $query->with(['workers' => function($q) {
+            $q->with('categories'); 
+        }])->get();
+
+        // Mapear para que workers no sea null
+        $users = $users->map(function($user) {
+            if (!$user->workers) {
+                $user->workers = new \stdClass();
+                $user->workers->categories = [];
+            } elseif (!$user->workers->categories) {
+                $user->workers->categories = [];
+            }
+            return $user;
+        });
+
+        return response()->json($users);
+    }
+
+
 }
 

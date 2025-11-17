@@ -128,7 +128,7 @@ Route::get('/clientrequests/{id}', function ($id) {
 });
 Route::get('/categories', [CategoryController::class, 'index']);
 
-Route::get('/workers/search', [CategoryController::class, 'searchWorkers']);
+Route::middleware('auth:sanctum')->get('/search/workers', [WorkerController::class, 'searchWorkers']);
 
 
 Route::middleware('auth:sanctum')->post('/create-client-request', function (Request $request) {
