@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->get('/user/type', function () {
 
     if ($user->workers) {
         return response()->json(['type' => 2]);
-    } elseif ($user->clients) {
+    } elseif ($user->client) {
         return response()->json(['type' => 1]);
     }
 
