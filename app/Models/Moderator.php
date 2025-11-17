@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Client
+ * Class Moderators
  * 
  * @property int $mod_id
  * @property int|null $user_id
@@ -19,18 +19,18 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Moderators extends Model
+class Moderator extends Model
 {
 	protected $table = 'moderators';
 	protected $primaryKey = 'mod_id';
 	public $timestamps = true;
 
 	protected $casts = [
-		'mod_id' => 'int'
+		'user_id' => 'int'
 	];
 
 	protected $fillable = [
-		'mod_id'
+		'user_id'
 	];
 
 	public function user() {

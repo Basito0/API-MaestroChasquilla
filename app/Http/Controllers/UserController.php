@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Worker;
 use App\Models\Client;
-use App\Models\Moderators;
+use App\Models\Moderator;
 
 class UserController extends Controller
 {
@@ -24,7 +24,7 @@ class UserController extends Controller
                 'address' => 'required|string',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
-                'type' => 'required|in:1,2',
+                'type' => 'required|in:1,2,3',
             ]);
             $user = User::create([
                 'first_name' => $validated['fname'],
@@ -49,6 +49,8 @@ class UserController extends Controller
                 Moderator::create([
                     'user_id' => $user->user_id,
                 ]);
+            } else {
+                throw new Exception('Hay un problema con el tipo: ' . $validated['type'] );
             }
 
             return response()->json([

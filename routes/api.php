@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Cors;
 use App\Models\Client;
+use App\Models\User;
 use App\Models\Worker;
 use App\Models\ClientRequest;
 use App\Models\WorkerRequest;
@@ -34,6 +35,45 @@ Route::middleware('auth:sanctum')->post('/logout', function () {
 
     return response()->json(['message' => 'Logout exitoso']);
 });
+
+Route::middleware('auth:sanctum')->delete('/users/{id}', function ($id) {
+    $user = Auth::user();
+
+    try {
+        // Verificar que el usuario autenticado sea moderador
+        if (!$user->moderator) {
+            return response()->json(['error' => 'Usuario no tiene permisos.'], 403);
+        }
+
+        $target = User::find($id);
+
+        if (!$target) {
+            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        }
+
+        $target->delete();
+
+        return response()->json(['message' => 'Usuario eliminado exitosamente']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al eliminar usuario', 'details' => $e->getMessage()], 500);
+    }
+});
+
+Route::middleware('auth:sanctum')->get('/get_users', function () {
+    $user = Auth::user();
+
+    try {
+        if ($user->moderator) { // relación definida en User
+            $users = User::all();
+            return response()->json($users);
+        } else {
+            return response()->json(['error' => 'Usuario no tiene permisos.'], 403);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Query failed', 'details' => $e->getMessage()], 500);
+    }
+});
+
 
 Route::middleware('auth:sanctum')->get('/user/type', function () {
     $user = Auth::user();
