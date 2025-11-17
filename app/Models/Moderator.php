@@ -26,11 +26,11 @@ class Moderator extends Model
 	public $timestamps = true;
 
 	protected $casts = [
-		'mod_id' => 'int'
+		'user_id' => 'int'
 	];
 
 	protected $fillable = [
-		'mod_id'
+		'user_id'
 	];
 
 	public function user() {
