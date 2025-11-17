@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->get('/user/type', function () {
         return response()->json(['type' => 2]);
     } elseif ($user->client) {
         return response()->json(['type' => 1]);
+    } elseif ($user->moderator) {
+        return response()->json(['type' => 3]);
     }
 
     return response()->json(['type' => null]);

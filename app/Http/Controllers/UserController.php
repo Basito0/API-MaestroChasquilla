@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Worker;
 use App\Models\Client;
+use App\Models\Moderators;
 
 class UserController extends Controller
 {
@@ -40,8 +41,12 @@ class UserController extends Controller
                 Client::create([
                     'user_id' => $user->user_id,
                 ]);
-            } else {
+            } elseif ($validated['type'] == 2) {
                 Worker::create([
+                    'user_id' => $user->user_id,
+                ]);
+            } elseif ($validated['type'] == 3) {
+                Moderator::create([
                     'user_id' => $user->user_id,
                 ]);
             }

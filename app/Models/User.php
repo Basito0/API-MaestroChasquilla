@@ -33,6 +33,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Collection|Client[] $clients
  * @property Collection|Review[] $reviews
  * @property Collection|Worker[] $workers
+ * @property Collection|Moderator[] $workers
  *
  * @package App\Models
  */
@@ -70,6 +71,10 @@ class User extends Authenticatable
 		return $this->hasOne(Client::class, 'user_id', 'user_id');
 	}
 
+	public function moderator()
+	{
+		return $this->hasOne(Moderator::class, 'user_id', 'user_id');
+	}
 
 	public function reviews()
 	{
