@@ -85,4 +85,11 @@ class User extends Authenticatable
 	{
 		return $this->hasOne(Worker::class, 'user_id', 'user_id');
 	}
+
+	// User.php
+	public function conversations()
+	{
+		return $this->hasMany(Conversation::class, 'user_id', 'user_id');
+	}
+
 }

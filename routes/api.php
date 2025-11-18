@@ -12,6 +12,9 @@ use App\Models\User;
 use App\Models\Worker;
 use App\Models\ClientRequest;
 use App\Models\WorkerRequest;
+use App\Models\Conversation;
+use App\Models\Moderator;
+use App\Models\Message;
 
 
 
@@ -87,6 +90,90 @@ Route::middleware('auth:sanctum')->get('/user/type', function () {
     }
 
     return response()->json(['type' => null]);
+});
+
+Route::middleware('auth:sanctum')->post('/support_chat', function () {
+    $user = Auth::user();
+
+    try {
+        // Verificar si ya existe una conversación
+        $conversation = $user->conversations()->first();
+
+        if (!$conversation) {
+
+            // Buscar un moderador disponible
+            $moderator = Moderator::inRandomOrder()->first();
+
+            if (!$moderator) {
+                return response()->json([
+                    'error' => 'No hay moderadores disponibles'
+                ], 500);
+            }
+
+            $conversation = Conversation::create([
+                'user_id' => $user->user_id,
+                'mod_id' => $moderator->mod_id,
+            ]);
+
+            return response()->json([
+                'message' => 'Conversación creada',
+                'conversation' => $conversation,
+            ], 201);
+        }
+
+        return response()->json([
+            'message' => 'Ya existe una conversación',
+            'conversation' => $conversation,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al crear conversación',
+            'details' => $e->getMessage()
+        ], 500);
+    }
+});
+
+Route::middleware('auth:sanctum')->get('/conversations/{id}/messages', function ($id) {
+    $user = Auth::user();
+
+    try {
+        $conversation = Conversation::findOrFail($id);
+
+        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== $user->user_id) {
+            return response()->json(['error' => 'No tienes acceso a esta conversación'], 403);
+        }
+
+        $messages = $conversation->messages()->with('sender')->orderBy('created_at')->get();
+
+        return response()->json($messages);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al obtener mensajes', 'details' => $e->getMessage()], 500);
+    }
+});
+
+Route::middleware('auth:sanctum')->post('/conversations/{id}/messages', function (Request $request, $id) {
+    $user = Auth::user();
+
+    try {
+        $conversation = Conversation::findOrFail($id);
+
+        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== $user->user_id) {
+            return response()->json(['error' => 'No tienes acceso a esta conversación'], 403);
+        }
+
+        $message = Message::create([
+            'conversation_id' => $conversation->conversation_id,
+            'sender_id' => $user->user_id,
+            'content' => $request->input('content'),
+        ]);
+
+        return response()->json([
+            'message' => 'Mensaje enviado',
+            'data' => $message
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al enviar mensaje', 'details' => $e->getMessage()], 500);
+    }
 });
 
 
