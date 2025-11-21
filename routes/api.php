@@ -62,6 +62,33 @@ Route::middleware('auth:sanctum')->delete('/users/{id}', function ($id) {
     }
 });
 
+//elimiar client-request
+Route::middleware('auth:sanctum')->delete('/clientrequests/{id}', function ($id, Request $request) {
+    $user = Auth::user();
+
+    try {
+        // Verificar que el usuario autenticado sea moderador
+        if (!$user->moderator) {
+            return response()->json(['error' => 'Usuario no tiene permisos.'], 403);
+        }
+
+        $clientRequest = ClientRequest::find($id);
+
+        if (!$clientRequest) {
+            return response()->json(['error' => 'Solicitud no encontrada.'], 404);
+        }
+
+        $clientRequest->delete();
+
+        return response()->json(['message' => 'Solicitud eliminada exitosamente']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al eliminar la solicitud', 
+            'details' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::middleware('auth:sanctum')->get('/get_users', function () {
     $user = Auth::user();
 
