@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('client_requests', function (Blueprint $table) {
             $table->bigIncrements('client_request_id');
             $table->foreignId('client_id')->nullable()->constrained('clients', 'client_id')->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('categories', 'category_id')->onDelete('set null');
             $table->string('title');
             $table->string('description');
             $table->integer('budget')->default(0);

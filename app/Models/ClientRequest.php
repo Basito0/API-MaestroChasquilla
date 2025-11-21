@@ -32,7 +32,8 @@ class ClientRequest extends Model
 
 	protected $casts = [
 		'client_id' => 'int',
-		'budget' => 'int'
+		'budget' => 'int',
+		'category_id' => 'int'
 	];
 
 	protected $fillable = [
@@ -40,7 +41,8 @@ class ClientRequest extends Model
 		'title',
 		'description',
 		'budget',
-		'address'
+		'address',
+		'category_id'
 	];
 
 	public function client() {
@@ -50,5 +52,10 @@ class ClientRequest extends Model
 	public function works()
 	{
 		return $this->hasMany(Work::class);
+	}
+
+	public function category()
+	{
+		return $this->belongsTo(Category::class, 'category_id', 'category_id');
 	}
 }

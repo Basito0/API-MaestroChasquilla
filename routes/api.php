@@ -245,7 +245,7 @@ Route::get('/workerrequests', function () {
 });
 
 Route::get('/clientrequests/{id}', function ($id) {
-    $request = ClientRequest::with('client.user')->find($id);
+    $request = ClientRequest::with('client.user', 'category')->find($id);
 
     if (!$request) {
         return response()->json(['error' => 'Request not found'], 404);
@@ -268,6 +268,7 @@ Route::middleware('auth:sanctum')->post('/create-client-request', function (Requ
         'street' => 'required|string|max:200',
         'city' => 'required|string|max:30',
         'region' => 'required|string|max:25',
+        'category_id' => 'required|integer|exists:categories,category_id',
     ]);
 
     $address = "{$validated['street']}, {$validated['city']}, {$validated['region']}";
@@ -278,6 +279,7 @@ Route::middleware('auth:sanctum')->post('/create-client-request', function (Requ
         'description' => $validated['description'],
         'budget' => $validated['budget'],
         'address' => $address,
+        'category_id' => $validated['category_id'],
     ]);
 
     return response()->json([
