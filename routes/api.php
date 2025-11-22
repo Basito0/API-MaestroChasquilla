@@ -62,6 +62,29 @@ Route::middleware('auth:sanctum')->delete('/users/{id}', function ($id) {
     }
 });
 
+Route::middleware('auth:sanctum')->delete('/client_requests/{id}', function ($id) {
+    $user = Auth::user();
+
+    try {
+        // Verificar que el usuario autenticado sea moderador
+        if (!$user->moderator) {
+            return response()->json(['error' => 'Usuario no tiene permisos.'], 403);
+        }
+
+        $target = ClientRequest::find($id);
+
+        if (!$target) {
+            return response()->json(['error' => 'Post no encontrado.'], 404);
+        }
+
+        $target->delete();
+
+        return response()->json(['message' => 'Post eliminado exitosamente']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al eliminar Post', 'details' => $e->getMessage()], 500);
+    }
+});
+
 Route::middleware('auth:sanctum')->get('/get_users', function () {
     $user = Auth::user();
 
@@ -295,7 +318,7 @@ Route::middleware('auth:sanctum')->post('/create-client-request', function (Requ
         'street' => 'required|string|max:200',
         'city' => 'required|string|max:30',
         'region' => 'required|string|max:25',
-        'category_id' => 'required|integer|exists:categories,category_id',
+        'category_id' => 'nullable|integer|exists:categories,category_id',
     ]);
 
     $address = "{$validated['street']}, {$validated['city']}, {$validated['region']}";
