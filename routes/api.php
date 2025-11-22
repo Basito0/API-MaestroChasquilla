@@ -176,6 +176,21 @@ Route::middleware('auth:sanctum')->post('/conversations/{id}/messages', function
     }
 });
 
+#Endpoint para moderador
+Route::middleware('auth:sanctum')->get('/mod_conversations', function (Request $request) {
+    $user = Auth::user();
+
+    try {
+        $conversations = Conversation::where('mod_id', $user->moderator->mod_id)->get();
+
+        return response()->json([
+            'message' => 'Conversaciones recuperadas',
+            'data' => $conversations
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al enviar mensaje', 'details' => $e->getMessage()], 500);
+    }
+});
 
 #Route::get('/user', function (Request $request) {
  #   return $request->user();
