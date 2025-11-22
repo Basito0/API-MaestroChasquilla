@@ -139,8 +139,14 @@ Route::middleware('auth:sanctum')->get('/conversations/{id}/messages', function 
     try {
         $conversation = Conversation::findOrFail($id);
 
-        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== $user->user_id) {
-            return response()->json(['error' => 'No tienes acceso a esta conversación'], 403);
+        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== optional($user->moderator)->mod_id) {
+            return response()->json([
+                'error' => 'No tienes acceso a esta conversación',
+                'conversation_user_id' => $conversation->user_id,
+                'auth_user_id' => $user->user_id,
+                'conversation_mod_id' => $conversation->mod_id,
+                'auth_mod_id' => $user->moderator->mod_id,
+            ], 403);
         }
 
         $messages = $conversation->messages()->with('sender')->orderBy('created_at')->get();
@@ -157,8 +163,14 @@ Route::middleware('auth:sanctum')->post('/conversations/{id}/messages', function
     try {
         $conversation = Conversation::findOrFail($id);
 
-        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== $user->user_id) {
-            return response()->json(['error' => 'No tienes acceso a esta conversación'], 403);
+        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== optional($user->moderator)->mod_id) {
+            return response()->json([
+                'error' => 'No tienes acceso a esta conversación',
+                'conversation_user_id' => $conversation->user_id,
+                'auth_user_id' => $user->user_id,
+                'conversation_mod_id' => $conversation->mod_id,
+                'auth_mod_id' => $user->moderator->mod_id,
+            ], 403);
         }
 
         $message = Message::create([
