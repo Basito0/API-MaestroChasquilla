@@ -62,8 +62,7 @@ Route::middleware('auth:sanctum')->delete('/users/{id}', function ($id) {
     }
 });
 
-//elimiar client-request
-Route::middleware('auth:sanctum')->delete('/clientrequests/{id}', function ($id, Request $request) {
+Route::middleware('auth:sanctum')->delete('/client_requests/{id}', function ($id) {
     $user = Auth::user();
 
     try {
@@ -72,20 +71,17 @@ Route::middleware('auth:sanctum')->delete('/clientrequests/{id}', function ($id,
             return response()->json(['error' => 'Usuario no tiene permisos.'], 403);
         }
 
-        $clientRequest = ClientRequest::find($id);
+        $target = ClientRequest::find($id);
 
-        if (!$clientRequest) {
-            return response()->json(['error' => 'Solicitud no encontrada.'], 404);
+        if (!$target) {
+            return response()->json(['error' => 'Post no encontrado.'], 404);
         }
 
-        $clientRequest->delete();
+        $target->delete();
 
-        return response()->json(['message' => 'Solicitud eliminada exitosamente']);
+        return response()->json(['message' => 'Post eliminado exitosamente']);
     } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Error al eliminar la solicitud', 
-            'details' => $e->getMessage()
-        ], 500);
+        return response()->json(['error' => 'Error al eliminar Post', 'details' => $e->getMessage()], 500);
     }
 });
 
@@ -166,8 +162,14 @@ Route::middleware('auth:sanctum')->get('/conversations/{id}/messages', function 
     try {
         $conversation = Conversation::findOrFail($id);
 
-        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== $user->user_id) {
-            return response()->json(['error' => 'No tienes acceso a esta conversación'], 403);
+        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== optional($user->moderator)->mod_id) {
+            return response()->json([
+                'error' => 'No tienes acceso a esta conversación',
+                'conversation_user_id' => $conversation->user_id,
+                'auth_user_id' => $user->user_id,
+                'conversation_mod_id' => $conversation->mod_id,
+                'auth_mod_id' => $user->moderator->mod_id,
+            ], 403);
         }
 
         $messages = $conversation->messages()->with('sender')->orderBy('created_at')->get();
@@ -184,8 +186,14 @@ Route::middleware('auth:sanctum')->post('/conversations/{id}/messages', function
     try {
         $conversation = Conversation::findOrFail($id);
 
-        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== $user->user_id) {
-            return response()->json(['error' => 'No tienes acceso a esta conversación'], 403);
+        if ($conversation->user_id !== $user->user_id && $conversation->mod_id !== optional($user->moderator)->mod_id) {
+            return response()->json([
+                'error' => 'No tienes acceso a esta conversación',
+                'conversation_user_id' => $conversation->user_id,
+                'auth_user_id' => $user->user_id,
+                'conversation_mod_id' => $conversation->mod_id,
+                'auth_mod_id' => $user->moderator->mod_id,
+            ], 403);
         }
 
         $message = Message::create([
@@ -203,6 +211,21 @@ Route::middleware('auth:sanctum')->post('/conversations/{id}/messages', function
     }
 });
 
+#Endpoint para moderador
+Route::middleware('auth:sanctum')->get('/mod_conversations', function (Request $request) {
+    $user = Auth::user();
+
+    try {
+        $conversations = Conversation::where('mod_id', $user->moderator->mod_id)->get();
+
+        return response()->json([
+            'message' => 'Conversaciones recuperadas',
+            'data' => $conversations
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al enviar mensaje', 'details' => $e->getMessage()], 500);
+    }
+});
 
 #Route::get('/user', function (Request $request) {
  #   return $request->user();
@@ -295,7 +318,7 @@ Route::middleware('auth:sanctum')->post('/create-client-request', function (Requ
         'street' => 'required|string|max:200',
         'city' => 'required|string|max:30',
         'region' => 'required|string|max:25',
-        'category_id' => 'required|integer|exists:categories,category_id',
+        'category_id' => 'nullable|integer|exists:categories,category_id',
     ]);
 
     $address = "{$validated['street']}, {$validated['city']}, {$validated['region']}";
