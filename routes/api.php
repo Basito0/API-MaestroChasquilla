@@ -15,6 +15,7 @@ use App\Models\WorkerRequest;
 use App\Models\Conversation;
 use App\Models\Moderator;
 use App\Models\Message;
+use App\Models\Work;
 
 
 
@@ -335,5 +336,28 @@ Route::middleware('auth:sanctum')->post('/create-client-request', function (Requ
     return response()->json([
         'message' => 'Solicitud creada exitosamente',
         'client_request' => $clientRequest
+    ], 201);
+});
+
+Route::middleware('auth:sanctum')->post('/create_work', function (Request $request) {
+    $user = Auth::user();
+
+    $validated = $request->validate([
+        'client_id' => 'required|integer|exists:clients,client_id',
+        'client_request_id' => 'required|integer|exists:client_requests,client_request_id',
+        'state' => 'required|string',
+    ]);
+
+    // worker_id viene del usuario autenticado
+    $work = Work::create([
+        'client_id' => $validated['client_id'],
+        'worker_id' => $user->workers?->worker_id,   // el worker autenticado
+        'client_request_id' => $validated['client_request_id'],
+        'state' => $validated['state'],
+    ]);
+
+    return response()->json([
+        'message' => 'Solicitud creada exitosamente',
+        'work' => $work
     ], 201);
 });
