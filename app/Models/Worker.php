@@ -59,7 +59,4 @@ class Worker extends Model
             'category_id'           // FK del modelo relacionado en la pivote
         );
     }
-
-
-
 }
