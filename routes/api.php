@@ -3,6 +3,8 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\RegionController;
+use App\Http\Controllers\CommuneController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -305,6 +307,10 @@ Route::get('/clientrequests/{id}', function ($id) {
     return response()->json($request);
 });
 Route::get('/categories', [CategoryController::class, 'index']);
+// regiones
+Route::get('/regions', [RegionController::class, 'index']);
+// comunas de una región
+Route::get('/regions/{region_id}/communes', [RegionController::class, 'communes']);
 
 Route::middleware('auth:sanctum')->get('/search/workers', [WorkerController::class, 'searchWorkers']);
 
