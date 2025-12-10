@@ -368,3 +368,18 @@ Route::middleware('auth:sanctum')->post('/create_work', function (Request $reque
         'work' => $work
     ], 201);
 });
+
+Route::middleware('auth:sanctum')->get('/my-requests', function () {
+    $user = Auth::user();
+    if (!$user->client) {
+        return response()->json([
+            'error' => 'Solo clientes pueden ver sus propias solicitudes'
+        ], 403);
+    }
+
+    $clientId = $user->client->client_id;
+
+    $requests = ClientRequest::where('client_id', $clientId)->get();
+
+    return response()->json($requests, 200);
+});
