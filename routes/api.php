@@ -355,7 +355,18 @@ Route::middleware('auth:sanctum')->post('/create_work', function (Request $reque
         'client_request_id' => 'required|integer|exists:client_requests,client_request_id',
         'state' => 'required|string',
     ]);
+    $workerId = $user->workers?->worker_id;
 
+    // Validar que el worker no haya postulado antes a esta solicitud
+    $exists = Work::where('worker_id', $workerId)
+                  ->where('client_request_id', $validated['client_request_id'])
+                  ->exists();
+
+    if ($exists) {
+        return response()->json([
+            'error' => 'Ya postulaste a esta solicitud.'
+        ], 409);
+    }
     // worker_id viene del usuario autenticado
     $work = Work::create([
         'client_id' => $validated['client_id'],
@@ -383,7 +394,7 @@ Route::middleware('auth:sanctum')->get('/work-chats', function () {
         $clientId = $user->client->client_id;
 
         $chats = WorkConversation::where('client_id', $clientId)
-            ->with(['worker.user', 'work'])
+            ->with(['worker.user', 'work', 'work.client_request'])
             ->get();
     } 
     elseif ($user->workers) {
@@ -391,7 +402,7 @@ Route::middleware('auth:sanctum')->get('/work-chats', function () {
         $workerId = $user->workers->worker_id;
 
         $chats = WorkConversation::where('worker_id', $workerId)
-            ->with(['client.user', 'work'])
+            ->with(['client.user', 'work', 'work.client_request'])
             ->get();
     }
     else {
@@ -406,7 +417,6 @@ Route::middleware('auth:sanctum')->get('/work-conversations/{id}/messages', func
     $user = Auth::user();
     $conversation = WorkConversation::findOrFail($id);
 
-    // Validar acceso
     if (
         $conversation->client_id !== optional($user->client)->client_id &&
         $conversation->worker_id !== optional($user->workers)->worker_id
@@ -419,8 +429,11 @@ Route::middleware('auth:sanctum')->get('/work-conversations/{id}/messages', func
         ->orderBy('created_at')
         ->get();
 
-    return response()->json($messages, 200);
+    return response()->json([
+        'data' => $messages
+    ], 200);
 });
+
 
 //enviar un mensaje
 Route::middleware('auth:sanctum')->post('/work-conversations/{id}/messages', function (Request $request, $id) {
@@ -444,7 +457,26 @@ Route::middleware('auth:sanctum')->post('/work-conversations/{id}/messages', fun
         'content' => $request->content,
     ]);
 
-    return response()->json($message, 201);
+    return response()->json([
+        'data' => $message
+    ], 201);
+});
+
+
+Route::middleware('auth:sanctum')->get('/work-conversations/{id}', function ($id) {
+    $user = Auth::user();
+
+    $conversation = WorkConversation::with(['client.user', 'worker.user', 'work'])
+        ->findOrFail($id);
+
+    if (
+        $conversation->client_id !== optional($user->client)->client_id &&
+        $conversation->worker_id !== optional($user->workers)->worker_id
+    ) {
+        return response()->json(['error' => 'No autorizado'], 403);
+    }
+
+    return response()->json($conversation, 200);
 });
 
 Route::middleware('auth:sanctum')->get('/my-requests', function () {

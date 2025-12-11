@@ -49,8 +49,12 @@ class Work extends Model
 
 	public function client_request()
 	{
-		return $this->belongsTo(ClientRequest::class);
-	}
+		return $this->belongsTo(
+			ClientRequest::class,
+			'client_request_id',      
+			'client_request_id'      
+		);
+}
 
 	public function worker()
 	{
