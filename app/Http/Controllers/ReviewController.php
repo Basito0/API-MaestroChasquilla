@@ -68,4 +68,19 @@ class ReviewController extends Controller
             'review' => $review
         ], 201);
     }
+
+    public function myReviews()
+    {
+        $user = auth()->user();
+
+        $reviews = Review::where('reviewed_id', $user->user_id)
+            ->with([
+                'reviewer',        // quién escribió la reseña
+                'work.client_request' // para mostrar el título del trabajo
+            ])
+            ->orderBy('review_id', 'desc')
+            ->get();
+
+        return response()->json($reviews);
+    }
 }

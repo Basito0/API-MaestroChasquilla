@@ -522,3 +522,37 @@ Route::middleware('auth:sanctum')->get('/my-works', [WorkController::class, 'myW
 
 // Ruta para que el maestro vea los trabajos que ha realizado
 Route::middleware('auth:sanctum')->get('/my-worked-jobs', [WorkController::class, 'myWorkedJobs']);
+
+Route::middleware('auth:sanctum')->get('/my-reviews', [ReviewController::class, 'myReviews']);
+
+Route::middleware('auth:sanctum')->delete('/my-client-requests/{id}', function ($id) {
+    $user = Auth::user();
+    if (!$user->client) {
+        return response()->json(['error' => 'Solo los clientes pueden eliminar solicitudes.'], 403);
+    }
+    $request = ClientRequest::find($id);
+
+    if (!$request) {
+        return response()->json(['error' => 'Solicitud no encontrada.'], 404);
+    }
+
+    if ($request->client_id !== $user->client->client_id) {
+        return response()->json(['error' => 'No puedes eliminar esta solicitud.'], 403);
+    }
+
+    $hasAcceptedWork = $request->works()
+        ->where('state', 'aceptado')
+        ->exists();
+
+    if ($hasAcceptedWork) {
+        return response()->json([
+            'error' => 'No puedes eliminar una solicitud con trabajos aceptados.'
+        ], 422);
+    }
+
+    $request->delete();
+
+    return response()->json([
+        'message' => 'Solicitud eliminada correctamente.'
+    ]);
+});
