@@ -8,6 +8,7 @@ use App\Http\Controllers\CommuneController;
 use App\Http\Controllers\WorkerVerificationController;
 use App\Http\Controllers\ClientRequestController;
 use App\Http\Controllers\WorkController;
+use App\Http\Controllers\ReviewController;
 
 
 use Illuminate\Http\Request;
@@ -509,7 +510,8 @@ Route::middleware('auth:sanctum')->get(
 Route::middleware('auth:sanctum')->get('/works/{id}', function ($id) {
     return App\Models\Work::with([
         'client.user',
-        'worker.user'
+        'worker.user',
+        'client_request' 
     ])->findOrFail($id);
 });
 

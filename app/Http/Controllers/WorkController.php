@@ -15,7 +15,7 @@ class WorkController extends Controller
         if ($user->client) {
             $works = Work::where('client_id', $user->client->client_id)
                 ->where('state', 'aceptado')
-                ->with(['client', 'worker', 'client_request'])
+                ->with(['client.user', 'worker.user', 'client_request'])
                 ->get();
 
             return response()->json($works);
@@ -32,7 +32,7 @@ class WorkController extends Controller
         if ($user->workers) {
             $works = Work::where('worker_id', $user->workers->worker_id)
                 ->where('state', 'aceptado') 
-                ->with(['client', 'worker', 'client_request'])
+                ->with(['client.user', 'worker.user', 'client_request'])
                 ->get();
 
             return response()->json($works);
