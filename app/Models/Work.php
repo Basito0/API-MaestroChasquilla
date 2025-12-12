@@ -44,7 +44,7 @@ class Work extends Model
 
 	public function client()
 	{
-		return $this->belongsTo(Client::class);
+		return $this->belongsTo(Client::class, 'client_id', 'client_id');
 	}
 
 	public function client_request()
@@ -58,6 +58,6 @@ class Work extends Model
 
 	public function worker()
 	{
-		return $this->belongsTo(Worker::class);
+		return $this->belongsTo(Worker::class, 'worker_id', 'worker_id');
 	}
 }

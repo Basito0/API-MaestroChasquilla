@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->integer('score')->default(0);
+            $table->foreignId('work_id')->constrained('works', 'work_id')->onDelete('cascade');
         });
     }
 

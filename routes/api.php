@@ -6,6 +6,9 @@ use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\CommuneController;
 use App\Http\Controllers\WorkerVerificationController;
+use App\Http\Controllers\ClientRequestController;
+use App\Http\Controllers\WorkController;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -385,7 +388,11 @@ Route::middleware('auth:sanctum')->post('/create_work', function (Request $reque
         'work' => $work
     ], 201);
 });
-
+//seleccionar maestro para una client request
+Route::middleware('auth:sanctum')->patch(
+    '/client-requests/{id}/select-master',
+    [ClientRequestController::class, 'selectMaster']
+);
 //obtener todos los chats del usuario
 Route::middleware('auth:sanctum')->get('/work-chats', function () {
     $user = Auth::user();
@@ -493,3 +500,23 @@ Route::middleware('auth:sanctum')->get('/my-requests', function () {
 
     return response()->json($requests, 200);
 });
+
+Route::middleware('auth:sanctum')->get(
+    '/client-requests/{id}',
+    [ClientRequestController::class, 'show']
+);
+
+Route::middleware('auth:sanctum')->get('/works/{id}', function ($id) {
+    return App\Models\Work::with([
+        'client.user',
+        'worker.user'
+    ])->findOrFail($id);
+});
+
+Route::middleware('auth:sanctum')->post('/reviews', [ReviewController::class, 'store']);
+
+// Ruta para que el cliente vea sus trabajos
+Route::middleware('auth:sanctum')->get('/my-works', [WorkController::class, 'myWorks']);
+
+// Ruta para que el maestro vea los trabajos que ha realizado
+Route::middleware('auth:sanctum')->get('/my-worked-jobs', [WorkController::class, 'myWorkedJobs']);

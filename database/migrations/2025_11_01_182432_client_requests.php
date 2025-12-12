@@ -19,6 +19,11 @@ return new class extends Migration
             $table->string('description');
             $table->integer('budget')->default(0);
             $table->string('address');
+            $table->foreignId('selected_worker_id')
+                ->nullable()
+                ->constrained('workers', 'worker_id')
+                ->nullOnDelete();
+            $table->timestamps();
         });
     }
 

@@ -28,12 +28,14 @@ class ClientRequest extends Model
 {
 	protected $table = 'client_requests';
 	protected $primaryKey = 'client_request_id';
-	public $timestamps = false;
+	public $timestamps = true;
 
 	protected $casts = [
 		'client_id' => 'int',
 		'budget' => 'int',
-		'category_id' => 'int'
+		'category_id' => 'int',
+		'selected_worker_id' => 'int',
+        'selected_work_id' => 'int'
 	];
 
 	protected $fillable = [
@@ -42,7 +44,9 @@ class ClientRequest extends Model
 		'description',
 		'budget',
 		'address',
-		'category_id'
+		'category_id',
+		'selected_worker_id',
+        'selected_work_id'
 	];
 
 	public function client() {
@@ -51,11 +55,23 @@ class ClientRequest extends Model
 
 	public function works()
 	{
-		return $this->hasMany(Work::class);
+		return $this->hasMany(Work::class, 'client_request_id', 'client_request_id');
 	}
 
 	public function category()
 	{
 		return $this->belongsTo(Category::class, 'category_id', 'category_id');
 	}
+
+	//maestro seleccionado
+    public function selectedWorker()
+    {
+        return $this->belongsTo(Worker::class, 'selected_worker_id', 'worker_id');
+    }
+
+    //work seleccionado
+    public function selectedWork()
+    {
+        return $this->belongsTo(Work::class, 'selected_work_id', 'work_id');
+    }
 }
